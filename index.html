@@ -148,15 +148,26 @@ function generate(thickness, lazerWidth){
   var outerTOB=val.t2
   console.error(f(solved,h).t1/Math.PI,f(solved,h).t2/Math.PI)
 
-  var len=size/4
-  var inner=len/2,outer=len
+  var len=size/5
+  var inner=len/2,outer=len*4/3
   edge(len,outerTOA,inner,outer)
-  edge(1.8*len,outerTOA,inner,outer)
+  edge(len*0,outerTOA,inner,outer*4)
   edge(len,innerTOA,inner,outer)
 
+console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
+  var veca=[h*Math.sin(innerTOA),h*Math.cos(innerTOA),1]
+  var vecb=[h*Math.sin(innerTOB),h*Math.cos(innerTOB),1]
+  console.error(
+    'a',
+    180/Math.PI*Math.acos((veca[0]*veca[0]-veca[1]*veca[1]+veca[2]*veca[2])/(veca[0]*veca[0]+veca[1]*veca[1]+veca[2]*veca[2]))
+  )
+  console.error(
+    'b',
+    180/Math.PI*Math.acos((vecb[0]*vecb[0]-vecb[1]*vecb[1]+vecb[2]*vecb[2])/(vecb[0]*vecb[0]+vecb[1]*vecb[1]+vecb[2]*vecb[2]))
+  )
+
+
   function edge(len,toa,iarc,oarc){
-    var rinner=0
-    var router=0
     var pi5 = Math.PI/5
     var tob=Math.PI*6/5-toa
     var ta=Math.PI-toa
@@ -175,40 +186,50 @@ function generate(thickness, lazerWidth){
     rmin*=totalLen/l
     rmax*=totalLen/l
     l*=totalLen/l
-
+    var output=[];
+    function step01(n){
+      var arr=[];
+      for(var i=0;i<=n;i++)arr.push(i/n)
+      return arr;
+    }
     for(var i=0;i<5;i++){
       var t0=(2*i+0)*pi5,t1=(2*i+1)*pi5,t2=(2*i+2)*pi5,t3=(2*i+3)*pi5
       var x0=rmax*Math.cos(t0), y0=rmax*Math.sin(t0)
       var x1=rmin*Math.cos(t1), y1=rmin*Math.sin(t1)
       var x2=rmax*Math.cos(t2), y2=rmax*Math.sin(t2)
       var x3=rmin*Math.cos(t3), y3=rmin*Math.sin(t3)
-      svg.curve([0,1,2,3,4,5,6,7,8,9,10].map(function(i){
-        var t=i/10;
-        var rr=rmax-olen/Math.cos(tb)
-        var rad=Math.PI/2-tb
+      var arc1={rr: rmax-olen/Math.cos(tb), r: or, rad: Math.PI/2-tb}
+      var arc2={rr: rmin-ilen/Math.cos(ta), r: ir, rad: Math.PI/2-ta}
+      svg.curve(step01(10).map(function(t){
         return {
-          x:rr*Math.cos(t0)+or*Math.cos(t0-rad+2*rad*t),
-          y:rr*Math.sin(t0)+or*Math.sin(t0-rad+2*rad*t)
+          x:arc1.rr*Math.cos(t0)+or*Math.cos(t0+arc1.rad*(2*t-1)),
+          y:arc1.rr*Math.sin(t0)+or*Math.sin(t0+arc1.rad*(2*t-1))
         }
       }))
-      svg.line([
+      var line1, line2;
+      svg.line(line1=[
         {x: x0*ilen/l+x1*(l-ilen)/l, y: y0*ilen/l+y1*(l-ilen)/l},
         {x: x1*olen/l+x0*(l-olen)/l, y: y1*olen/l+y0*(l-olen)/l}
       ])
       svg.curve([0,1,2,3,4,5,6,7,8,9,10].map(function(i){
         var t=i/10;
-        var rr=rmin-ilen/Math.cos(ta)
-        var rad=Math.PI/2-ta
         return {
-          x:rr*Math.cos(t1)-ir*Math.cos(t1-rad+2*rad*t),
-          y:rr*Math.sin(t1)-ir*Math.sin(t1-rad+2*rad*t)
+          x:arc2.rr*Math.cos(t1)-ir*Math.cos(t1-arc2.rad*(2*t-1)),
+          y:arc2.rr*Math.sin(t1)-ir*Math.sin(t1-arc2.rad*(2*t-1))
         }
       }))
-      svg.line([
+      svg.line(line2=[
         {x: x2*ilen/l+x1*(l-ilen)/l, y: y2*ilen/l+y1*(l-ilen)/l},
         {x: x1*olen/l+x2*(l-olen)/l, y: y1*olen/l+y2*(l-olen)/l}
       ])
+      output.push({
+        line1: line1,
+        line2: line2,
+        arc1: arc1,
+        arc2: arc2
+      })
     }
+    return output
   }
 
   // var points=[];
