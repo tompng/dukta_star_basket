@@ -155,12 +155,12 @@ function generate(thickness, lazerWidth){
 
   var len=size/5
   var inner=len/2,outer=len*4/3
-  edge(len,outerTOA,inner,outer)
   edge(len,innerTOA,inner,outer)
+  var outerPos=edge(len,outerTOA,inner,outer)
   // edge(len*0,outerTOA,inner,outer*4)
   function shapeRadius(theta){
-    var r=12.5
-    return r*(1+1/3*Math.sqrt(1.125+Math.cos(5*theta)))
+    var r=12
+    return r*(1+1/2*Math.pow(1+1/8+Math.cos(5*theta),1/2))
   }
   function shapeInOut(x,y){
     return shapeRadius(Math.atan2(y,x))-Math.sqrt(x*x+y*y)
@@ -178,13 +178,50 @@ function generate(thickness, lazerWidth){
       else la=lc;
     }
   }
-  svg.line([
-    {x:14,y:3},lineIntersect(14,3,1,1,shapeInOut)
-  ])
-  svg.parametric(100,true,function(t){
+  svg.parametric(720,true,function(t){
     var th=2*Math.PI*t;
     var r=shapeRadius(th);
     return {x: r*Math.cos(th), y: r*Math.sin(th)}
+  })
+  outerPos.forEach(function(e,i){
+    var th=2*Math.PI*(i+0.5)/5
+    var cos=Math.cos(th),sin=Math.sin(th)
+    for(var j=0;j<=4;j++){
+      var p1={
+        x: cos*e.arc2.rr-e.arc2.r*Math.cos(th+e.arc2.rad*(2*j/4-1)),
+        y:sin*e.arc2.rr-e.arc2.r*Math.sin(th+e.arc2.rad*(2*j/4-1))
+      }
+      var p2=lineIntersect(p1.x,p1.y,cos,sin,shapeInOut)
+      var a=0.1
+      if(j%2==0){
+        svg.line([
+          {x:p1.x*(1-a)+(a)*p2.x,y:p1.y*(1-a)+(a)*p2.y},
+          {x:p1.x*(a)+(1-a)*p2.x,y:p1.y*(a)+(1-a)*p2.y}
+        ])
+      }else{
+        svg.line([p1,{x:p1.x*(0.5+a)+(0.5-a)*p2.x,y:p1.y*(0.5+a)+(0.5-a)*p2.y}])
+        svg.line([p2,{x:p1.x*(0.5-a)+(0.5+a)*p2.x,y:p1.y*(0.5-a)+(0.5+a)*p2.y}])
+      }
+    }
+    var th=2*Math.PI*(i+1)/5
+    var cos=Math.cos(th),sin=Math.sin(th)
+    for(var j=0;j<=8;j++){
+      var p1={
+        x: cos*e.arc1.rr+e.arc1.r*Math.cos(th+e.arc1.rad*(2*j/8-1)),
+        y:sin*e.arc1.rr+e.arc1.r*Math.sin(th+e.arc1.rad*(2*j/8-1))
+      }
+      var p2=lineIntersect(p1.x,p1.y,cos,sin,shapeInOut)
+      var a=0.1
+      if(j%2==0){
+        svg.line([
+          {x:p1.x*(1-a)+(a)*p2.x,y:p1.y*(1-a)+(a)*p2.y},
+          {x:p1.x*(a)+(1-a)*p2.x,y:p1.y*(a)+(1-a)*p2.y}
+        ])
+      }else{
+        svg.line([p1,{x:p1.x*(0.5+a)+(0.5-a)*p2.x,y:p1.y*(0.5+a)+(0.5-a)*p2.y}])
+        svg.line([p2,{x:p1.x*(0.5-a)+(0.5+a)*p2.x,y:p1.y*(0.5-a)+(0.5+a)*p2.y}])
+      }
+    }
   })
 
   console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
