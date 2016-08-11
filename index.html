@@ -187,9 +187,10 @@ function generate(thickness, lazerWidth){
     var th=2*Math.PI*(i+0.5)/5
     var cos=Math.cos(th),sin=Math.sin(th)
     for(var j=0;j<=4;j++){
+      var th2=Math.asin(Math.sin(e.arc2.rad)*(2*j/4-1))
       var p1={
-        x: cos*e.arc2.rr-e.arc2.r*Math.cos(th+e.arc2.rad*(2*j/4-1)),
-        y:sin*e.arc2.rr-e.arc2.r*Math.sin(th+e.arc2.rad*(2*j/4-1))
+        x: cos*e.arc2.rr-e.arc2.r*Math.cos(th+th2),
+        y:sin*e.arc2.rr-e.arc2.r*Math.sin(th+th2)
       }
       var p2=lineIntersect(p1.x,p1.y,cos,sin,shapeInOut)
       var a=0.1
@@ -206,9 +207,10 @@ function generate(thickness, lazerWidth){
     var th=2*Math.PI*(i+1)/5
     var cos=Math.cos(th),sin=Math.sin(th)
     for(var j=0;j<=8;j++){
+      var th2=Math.asin(Math.sin(e.arc1.rad)*(2*j/8-1))
       var p1={
-        x: cos*e.arc1.rr+e.arc1.r*Math.cos(th+e.arc1.rad*(2*j/8-1)),
-        y:sin*e.arc1.rr+e.arc1.r*Math.sin(th+e.arc1.rad*(2*j/8-1))
+        x: cos*e.arc1.rr+e.arc1.r*Math.cos(th+th2),
+        y:sin*e.arc1.rr+e.arc1.r*Math.sin(th+th2)
       }
       var p2=lineIntersect(p1.x,p1.y,cos,sin,shapeInOut)
       var a=0.1
