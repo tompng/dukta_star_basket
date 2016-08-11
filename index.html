@@ -38,6 +38,12 @@ SVG.prototype={
     }
     this.content+="<path stroke='black' fill='none' d='"+out.join(' ')+(loop?'z':'')+"' />";
   },
+  parametric: function(step, loop, func){
+    var points=[];
+    for(var i=0;i<=step;i++)points.push(func(i/step));
+    if(loop)points.pop();
+    this.curve(points, loop);
+  },
   curve: function(points, loop){
     points=this.transPoints(points);
     if(points.length>2){
@@ -118,7 +124,6 @@ function generate(thickness, lazerWidth){
   svg.trans={x:svg.width/3,y:svg.height/2,w:1,h:1};
   svg.lineWidth=lazerWidth||0.1;
   document.querySelector('span').textContent='Thickness='+T+' LazerWidth='+svg.lineWidth;
-
   function f(th,h){
     var tan1=Math.tan(th)
     var tan2=Math.tan(Math.PI-(Math.PI*6/5-th))
@@ -151,10 +156,19 @@ function generate(thickness, lazerWidth){
   var len=size/5
   var inner=len/2,outer=len*4/3
   edge(len,outerTOA,inner,outer)
-  edge(len*0,outerTOA,inner,outer*4)
   edge(len,innerTOA,inner,outer)
+  // edge(len*0,outerTOA,inner,outer*4)
+  function shapeRadius(theta){
+    var r=12.5
+    return r*(1+1/3*Math.sqrt(1.125+Math.cos(5*theta)))
+  }
+  svg.parametric(100,true,function(t){
+    var th=2*Math.PI*t;
+    var r=shapeRadius(th);
+    return {x: r*Math.cos(th), y: r*Math.sin(th)}
+  })
 
-console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
+  console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
   var veca=[h*Math.sin(innerTOA),h*Math.cos(innerTOA),1]
   var vecb=[h*Math.sin(innerTOB),h*Math.cos(innerTOB),1]
   console.error(
