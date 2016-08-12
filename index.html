@@ -265,8 +265,8 @@ function generate(thickness, lazerWidth){
     }
     var th=2*Math.PI*(i+1)/5
     var cos=Math.cos(th),sin=Math.sin(th)
-    for(var j=0;j<=8;j++){
-      var th2=Math.asin(Math.sin(e.arc1.rad)*(2*j/8-1))
+    for(var j=0;j<=12;j++){
+      var th2=Math.asin(Math.sin(e.arc1.rad)*(2*j/12-1))
       var p1={
         x: cos*e.arc1.rr+e.arc1.r*Math.cos(th+th2),
         y:sin*e.arc1.rr+e.arc1.r*Math.sin(th+th2)
@@ -297,8 +297,8 @@ function generate(thickness, lazerWidth){
   var edgerad=Math.atan(h)
   var ce=Math.cos(edgerad),se=Math.sin(edgerad);
   var d=svg.lineWidth/2;
-  for(var i=0;i<2;i++){
-    var startx=0,starty=10*i
+  for(var i=0;i<10;i++){
+    var startx=80,starty=thickness*3.1*i-60
     var tmpx=startx, tmpy=starty;
     var line=[
       {x:tmpx,y:tmpy},
@@ -317,15 +317,22 @@ function generate(thickness, lazerWidth){
     var b=line[3]
     var aa={x:(a.x+b.x-hbaseInterval)/2,y:a.y-thickness}
     var bb={x:(a.x+b.x+hbaseInterval)/2,y:a.y-thickness}
-    if(i%2==0){
+    if(i%2){
       line.splice(3,0,{x:aa.x,y:a.y},aa,bb,{x: bb.x,y:b.y})
+      svg.line([{x:aa.x,y:aa.y-2*thickness},{x:bb.x,y:bb.y-2*thickness}])
     }else{
       svg.line([aa,bb])
     }
     svg.curve([
       {x:tmpx,y:tmpy},
       {x:tmpx-thickness,y:tmpy-2*thickness},
-      {x:line[line.length-6].x,y:line[line.length-6].y-thickness}
+      {x:line[line.length-6].x,y:line[line.length-6].y-thickness},
+      {x:bb.x,y:bb.y-i%2*2*thickness}
+    ])
+    svg.curve([
+      {x:aa.x,y:aa.y-i%2*2*thickness},
+      {x:(aa.x+startx)/2,y:aa.y-thickness*2/3-i%2*thickness*2/3},
+      {x:startx,y:starty}
     ])
     svg.line(line)
 
