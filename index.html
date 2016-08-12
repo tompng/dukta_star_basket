@@ -115,13 +115,12 @@ function solveGradH(){
   //f(0)=>0 f(2)=>0
 }
 
-
 function generate(thickness, lazerWidth){
   var T=thickness;
   scale=1
   var size=20;
-  var svg=new SVG(size*7.3,size*7.3);
-  svg.trans={x:svg.width/3,y:svg.height/2,w:1,h:1};
+  var svg=new SVG(size*10,size*10);
+  svg.trans={x:svg.width/2.5,y:svg.height/2.5,w:1,h:1};
   svg.lineWidth=lazerWidth||0.1;
   document.querySelector('span').textContent='Thickness='+T+' LazerWidth='+svg.lineWidth;
   function f(th,h){
@@ -153,13 +152,22 @@ function generate(thickness, lazerWidth){
   var outerTOB=val.t2
   console.error(f(solved,h).t1/Math.PI,f(solved,h).t2/Math.PI)
 
-  var len=size/5
+  var len=size/1.3
   var inner=len/2,outer=len*4/3
   edge(len,innerTOA,inner,outer)
-  var outerPos=edge(len,outerTOA,inner,outer)
-  // edge(len*0,outerTOA,inner,outer*4)
+
+  console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
+  var veca=[h*Math.sin(innerTOA),h*Math.cos(innerTOA),1]
+  var vecb=[h*Math.sin(innerTOB),h*Math.cos(innerTOB),1]
+  var rada=Math.acos((veca[0]*veca[0]-veca[1]*veca[1]+veca[2]*veca[2])/(veca[0]*veca[0]+veca[1]*veca[1]+veca[2]*veca[2]))
+  var radb=Math.acos((vecb[0]*vecb[0]-vecb[1]*vecb[1]+vecb[2]*vecb[2])/(vecb[0]*vecb[0]+vecb[1]*vecb[1]+vecb[2]*vecb[2]))
+  console.error('a', 180/Math.PI*rada)
+  console.error('b', 180/Math.PI*radb)
+
+  var innerfix=(inner/rada-thickness)/(inner/rada)
+  var outerPos=edge(len,outerTOA,inner*innerfix,outer)
   function shapeRadius(theta){
-    var r=12
+    var r=2.6*len
     return r*(1+1/2*Math.pow(1+1/8+Math.cos(5*theta),1/2))
   }
   function shapeInOut(x,y){
@@ -225,19 +233,6 @@ function generate(thickness, lazerWidth){
       }
     }
   })
-
-  console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
-  var veca=[h*Math.sin(innerTOA),h*Math.cos(innerTOA),1]
-  var vecb=[h*Math.sin(innerTOB),h*Math.cos(innerTOB),1]
-  console.error(
-    'a',
-    180/Math.PI*Math.acos((veca[0]*veca[0]-veca[1]*veca[1]+veca[2]*veca[2])/(veca[0]*veca[0]+veca[1]*veca[1]+veca[2]*veca[2]))
-  )
-  console.error(
-    'b',
-    180/Math.PI*Math.acos((vecb[0]*vecb[0]-vecb[1]*vecb[1]+vecb[2]*vecb[2])/(vecb[0]*vecb[0]+vecb[1]*vecb[1]+vecb[2]*vecb[2]))
-  )
-
 
   function edge(len,toa,iarc,oarc){
     var pi5 = Math.PI/5
