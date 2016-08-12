@@ -286,6 +286,8 @@ function generate(thickness, lazerWidth){
   })
 
 
+
+
   // var hbaseOffset=not-calculated;
   // var hbaseLength=15
   // var hbaseInterval=8
@@ -293,6 +295,42 @@ function generate(thickness, lazerWidth){
   // var hduktaLength=8
   // var hedgeOffset=2
   // var hedgeLength=6
+
+
+  radb, outer
+  var duktaSupportR=outer/radb+thickness
+  for(var i=0;i<5;i++){
+    var basex=59,basey=8.2*i-75;
+    svg.parametric(100, false, function(t){
+      return {
+        x: basex+duktaSupportR*Math.sin(radb*(t-0.5)),
+        y: basey+duktaSupportR*Math.cos(radb*(t-0.5))
+      }
+    })
+    var tmpx=duktaSupportR*Math.sin(radb/2);
+    var tmpy=duktaSupportR*Math.cos(radb/2);
+    var dx=Math.cos(radb/2),dy=-Math.sin(radb/2)
+    var line=[]
+    line.push({x:tmpx,y:tmpy})
+    line.push({x:tmpx+=hduktaOffset*dx,y:tmpy+=hduktaOffset*dy})
+    line.push({x:tmpx+=thickness*dy,y:tmpy-=thickness*dx})
+    line.push({x:tmpx+=hduktaLength*dx,y:tmpy+=hduktaLength*dy})
+    line.push({x:tmpx-=thickness*dy,y:tmpy+=thickness*dx})
+    line.push({x:tmpx-=hduktaLength*dx/2,y:tmpy-=hduktaLength*dy/2})
+    svg.curve([
+      {x:basex+tmpx,y:basey+tmpy},
+      {x:basex+tmpx-thickness*2,y:basey+tmpy+thickness*3},
+      {x:basex,y:basey+duktaSupportR+thickness},
+      {x:basex-tmpx+thickness*2,y:basey+tmpy+thickness*3},
+      {x:basex-tmpx,y:basey+tmpy}
+    ])
+    for(var dir=-1;dir<=2;dir+=2){
+      svg.line(line.map(function(p){return {x:basex+dir*p.x,y:basey+p.y}}))
+    }
+
+  }
+
+
   var edgeThickOffset=thickness*Math.tan(Math.PI/8)
   var edgerad=Math.atan(h)
   var ce=Math.cos(edgerad),se=Math.sin(edgerad);
@@ -335,7 +373,6 @@ function generate(thickness, lazerWidth){
       {x:startx,y:starty}
     ])
     svg.line(line)
-
   }
 
 
