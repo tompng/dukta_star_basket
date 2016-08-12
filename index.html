@@ -210,31 +210,40 @@ function generate(thickness, lazerWidth){
     var r=shapeRadius(th);
     return {x: r*Math.cos(th), y: r*Math.sin(th)}
   })
+  var hbaseOffset;
+  var hbaseLength=15
+  var hbaseInterval=8
   innerPos.forEach(function(e,i){
     var hbasex=e.arc1.rr+e.arc1.r*Math.cos(e.arc1.rad)
     var hbasey=e.arc1.r*Math.sin(e.arc1.rad)
     var hdirx=Math.sin(innerTOB)
     var hdiry=-Math.cos(innerTOB)
-    hole(hbasex-2*hdirx,hbasey-2*hdiry,hbasex-17*hdirx,hbasey-17*hdiry,true,2*Math.PI*i/5)
-    hole(hbasex-2*hdirx,-hbasey+2*hdiry,hbasex-5*hdirx,-hbasey+5*hdiry,false,2*Math.PI*i/5)
-    hole(hbasex-14*hdirx,-hbasey+14*hdiry,hbasex-17*hdirx,-hbasey+17*hdiry,false,2*Math.PI*i/5)
+    var a=(hbasey+thickness*hdirx/2)/hdiry
+    hbaseOffset=a-hbaseLength/2
+    hole(hbasex-(a-hbaseLength/2)*hdirx,hbasey-(a-hbaseLength/2)*hdiry,hbasex-(a+hbaseLength/2)*hdirx,hbasey-(a+hbaseLength/2)*hdiry,true,2*Math.PI*i/5)
+    hole(hbasex-(a-hbaseLength/2)*hdirx,-hbasey+(a-hbaseLength/2)*hdiry,hbasex-(a-hbaseInterval/2)*hdirx,-hbasey+(a-hbaseInterval/2)*hdiry,false,2*Math.PI*i/5)
+    hole(hbasex-(a+hbaseInterval/2)*hdirx,-hbasey+(a+hbaseInterval/2)*hdiry,hbasex-(a+hbaseLength/2)*hdirx,-hbasey+(a+hbaseLength/2)*hdiry,false,2*Math.PI*i/5)
   })
+  var hduktaOffset=4
+  var hduktaLength=8
+  var hedgeOffset=2
+  var hedgeLength=6
   outerPos.forEach(function(e,i){
     var th=2*Math.PI*(i+0.5)/5
     var cos=Math.cos(th),sin=Math.sin(th)
 
     var hy=e.arc1.r*Math.sin(e.arc1.rad)
     var hx=e.arc1.rr+e.arc1.r
-    hole(hx,hy+4,hx,hy+12,true,2*Math.PI*i/5)
-    hole(hx,-hy-4,hx,-hy-12,false,2*Math.PI*i/5)
+    hole(hx,hy+hduktaOffset,hx,hy+(hduktaOffset+hduktaLength),true,2*Math.PI*i/5)
+    hole(hx,-hy-hduktaOffset,hx,-hy-(hduktaOffset+hduktaLength),false,2*Math.PI*i/5)
 
     var hbasex=e.arc1.rr+e.arc1.r*Math.cos(e.arc1.rad)
     var hbasey=e.arc1.r*Math.sin(e.arc1.rad)
     var hdirx=Math.sin(outerTOB)
     var hdiry=-Math.cos(outerTOB)
     console.error(hbasex,hbasey,hdirx,hdiry)
-    hole(hbasex+2*hdirx,hbasey+2*hdiry,hbasex+8*hdirx,hbasey+8*hdiry,false,2*Math.PI*i/5)
-    hole(hbasex+2*hdirx,-hbasey-2*hdiry,hbasex+8*hdirx,-hbasey-8*hdiry,true,2*Math.PI*i/5)
+    hole(hbasex+hedgeOffset*hdirx,hbasey+hedgeOffset*hdiry,hbasex+(hedgeOffset+hedgeLength)*hdirx,hbasey+(hedgeOffset+hedgeLength)*hdiry,false,hedgeOffset*Math.PI*i/5)
+    hole(hbasex+hedgeOffset*hdirx,-hbasey-hedgeOffset*hdiry,hbasex+(hedgeOffset+hedgeLength)*hdirx,-hbasey-(hedgeOffset+hedgeLength)*hdiry,true,2*Math.PI*i/5)
 
     for(var j=0;j<=4;j++){
       var th2=Math.asin(Math.sin(e.arc2.rad)*(2*j/4-1))
