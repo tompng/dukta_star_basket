@@ -243,7 +243,7 @@ function generate(thickness, lazerWidth){
     var hdirx=Math.sin(outerTOB)
     var hdiry=-Math.cos(outerTOB)
     console.error(hbasex,hbasey,hdirx,hdiry)
-    hole(hbasex+hedgeOffset*hdirx,hbasey+hedgeOffset*hdiry,hbasex+(hedgeOffset+hedgeLength)*hdirx,hbasey+(hedgeOffset+hedgeLength)*hdiry,false,hedgeOffset*Math.PI*i/5)
+    hole(hbasex+hedgeOffset*hdirx,hbasey+hedgeOffset*hdiry,hbasex+(hedgeOffset+hedgeLength)*hdirx,hbasey+(hedgeOffset+hedgeLength)*hdiry,false,2*Math.PI*i/5)
     hole(hbasex+hedgeOffset*hdirx,-hbasey-hedgeOffset*hdiry,hbasex+(hedgeOffset+hedgeLength)*hdirx,-hbasey-(hedgeOffset+hedgeLength)*hdiry,true,2*Math.PI*i/5)
 
     for(var j=0;j<=4;j++){
@@ -297,9 +297,9 @@ function generate(thickness, lazerWidth){
   // var hedgeOffset=2
   // var hedgeLength=6
 
-
   var d=svg.lineWidth/2;
-  var duktaSupportR=outer/radb+thickness
+  var duktaLen=2*outerPos[0].arc1.r*Math.sin(outerPos[0].arc1.rad)
+  var duktaSupportR=duktaLen/radb+thickness
   for(var i=0;i<5;i++){
     var basex=59,basey=8.2*i-75;
     svg.parametric(100, false, function(t){
