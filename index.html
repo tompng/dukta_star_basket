@@ -36,7 +36,7 @@ SVG.prototype={
       var p=points[i];
       out.push('L'+[p.x,p.y].join(' '));
     }
-    this.content+="<path stroke='black' fill='none' d='"+out.join(' ')+(loop?'z':'')+"' />";
+    this.content+="<path stroke='red' fill='none' d='"+out.join(' ')+(loop?'z':'')+"' />";
   },
   parametric: function(step, loop, func){
     var points=[];
@@ -83,7 +83,7 @@ SVG.prototype={
         ].join(' ')
       )
     }
-    this.content+="<path stroke='black' fill='none' d='"+out.join(' ')+(loop?'z':'')+"' />"
+    this.content+="<path stroke='red' fill='none' d='"+out.join(' ')+(loop?'z':'')+"' />"
   }
 }
 
@@ -143,6 +143,25 @@ function generate(thickness, lazerWidth){
       else{b=middle}
     }
   }
+  function hole(x,y,x2,y2,flip,rot){
+    var tmp
+    if(flip){var tmp=x;x=x2;x2=tmp;tmp=y;y=y2;y2=tmp;}
+    var cos=Math.cos(rot),sin=Math.sin(rot);
+    tmp=x;x=cos*x-sin*y,y=cos*y+sin*tmp;
+    tmp=x2;x2=cos*x2-sin*y2,y2=cos*y2+sin*tmp;
+
+    var dx2=x2-x,dy2=y2-y;
+    var dx=-dy2,dy=dx2;
+    var dr=Math.sqrt(dx*dx+dy*dy);dx/=dr;dy/=dr;
+    var len=Math.sqrt(dx2*dx2+dy2*dy2);dx2/=len;dy2/=len;
+    var d=svg.lineWidth/2;
+    svg.line([
+      {x:x+d*dx+d*dx2,y:y+d*dy+d*dy2},
+      {x:x+(thickness-d)*dx+d*dx2,y:y+(thickness-d)*dy+d*dy2},
+      {x:x+(thickness-d)*dx+(len-d)*dx2,y:y+(thickness-d)*dy+(len-d)*dy2},
+      {x:x+d*dx+(len-d)*dx2,y:y+d*dy+(len-d)*dy2}
+    ],true)
+  }
   var h=1
   console.error(solved=solve(h,0.001,Math.PI))
   var val=f(solved,h)
@@ -154,7 +173,6 @@ function generate(thickness, lazerWidth){
 
   var len=size/1.3
   var inner=len/2,outer=len*4/3
-  edge(len,innerTOA,inner,outer)
 
   console.error(innerTOA*180/Math.PI,innerTOB*180/Math.PI)
   var veca=[h*Math.sin(innerTOA),h*Math.cos(innerTOA),1]
@@ -165,6 +183,7 @@ function generate(thickness, lazerWidth){
   console.error('b', 180/Math.PI*radb)
 
   var innerfix=(inner/rada-thickness)/(inner/rada)
+  var innerPos=edge(len,innerTOA,inner,outer)
   var outerPos=edge(len,outerTOA,inner*innerfix,outer)
   function shapeRadius(theta){
     var r=2.6*len
@@ -191,9 +210,32 @@ function generate(thickness, lazerWidth){
     var r=shapeRadius(th);
     return {x: r*Math.cos(th), y: r*Math.sin(th)}
   })
+  innerPos.forEach(function(e,i){
+    var hbasex=e.arc1.rr+e.arc1.r*Math.cos(e.arc1.rad)
+    var hbasey=e.arc1.r*Math.sin(e.arc1.rad)
+    var hdirx=Math.sin(innerTOB)
+    var hdiry=-Math.cos(innerTOB)
+    hole(hbasex-2*hdirx,hbasey-2*hdiry,hbasex-17*hdirx,hbasey-17*hdiry,true,2*Math.PI*i/5)
+    hole(hbasex-2*hdirx,-hbasey+2*hdiry,hbasex-5*hdirx,-hbasey+5*hdiry,false,2*Math.PI*i/5)
+    hole(hbasex-14*hdirx,-hbasey+14*hdiry,hbasex-17*hdirx,-hbasey+17*hdiry,false,2*Math.PI*i/5)
+  })
   outerPos.forEach(function(e,i){
     var th=2*Math.PI*(i+0.5)/5
     var cos=Math.cos(th),sin=Math.sin(th)
+
+    var hy=e.arc1.r*Math.sin(e.arc1.rad)
+    var hx=e.arc1.rr+e.arc1.r
+    hole(hx,hy+4,hx,hy+12,true,2*Math.PI*i/5)
+    hole(hx,-hy-4,hx,-hy-12,false,2*Math.PI*i/5)
+
+    var hbasex=e.arc1.rr+e.arc1.r*Math.cos(e.arc1.rad)
+    var hbasey=e.arc1.r*Math.sin(e.arc1.rad)
+    var hdirx=Math.sin(outerTOB)
+    var hdiry=-Math.cos(outerTOB)
+    console.error(hbasex,hbasey,hdirx,hdiry)
+    hole(hbasex+2*hdirx,hbasey+2*hdiry,hbasex+8*hdirx,hbasey+8*hdiry,false,2*Math.PI*i/5)
+    hole(hbasex+2*hdirx,-hbasey-2*hdiry,hbasex+8*hdirx,-hbasey-8*hdiry,true,2*Math.PI*i/5)
+
     for(var j=0;j<=4;j++){
       var th2=Math.asin(Math.sin(e.arc2.rad)*(2*j/4-1))
       var p1={
