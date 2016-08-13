@@ -150,11 +150,18 @@ function generate(thickness, lazerWidth){
     var cos=Math.cos(rot),sin=Math.sin(rot);
     tmp=x;x=cos*x-sin*y,y=cos*y+sin*tmp;
     tmp=x2;x2=cos*x2-sin*y2,y2=cos*y2+sin*tmp;
-
     var dx2=x2-x,dy2=y2-y;
     var dx=-dy2,dy=dx2;
     var dr=Math.sqrt(dx*dx+dy*dy);dx/=dr;dy/=dr;
     var len=Math.sqrt(dx2*dx2+dy2*dy2);dx2/=len;dy2/=len;
+
+    // var l=thickness*3/4
+    // x-=dx2*l
+    // y-=dy2*l
+    // x2+=dx2*2*l
+    // y2+=dy2*2*l
+    // len+=2*l;
+
     var d=svg.lineWidth/2;
     svg.line([
       {x:x+d*dx+d*dx2,y:y+d*dy+d*dy2},
@@ -235,8 +242,6 @@ function generate(thickness, lazerWidth){
     hole(x1-h2Diff*hdiry,-y1-h2Diff*hdirx,x2-h2Diff*hdiry,-y2-h2Diff*hdirx,true,2*Math.PI*i/5)
 
   })
-  var hduktaOffset=4
-  var hduktaLength=6
   var hedgeOffset=2
   var hedgeLength=6
   outerPos.forEach(function(e,i){
@@ -245,8 +250,6 @@ function generate(thickness, lazerWidth){
 
     var hy=e.arc1.r*Math.sin(e.arc1.rad)
     var hx=e.arc1.rr+e.arc1.r
-    // hole(hx,hy+hduktaOffset,hx,hy+(hduktaOffset+hduktaLength),true,2*Math.PI*i/5)
-    // hole(hx,-hy-hduktaOffset,hx,-hy-(hduktaOffset+hduktaLength),false,2*Math.PI*i/5)
 
     var hbasex=e.arc1.rr+e.arc1.r*Math.cos(e.arc1.rad)
     var hbasey=e.arc1.r*Math.sin(e.arc1.rad)
@@ -259,8 +262,8 @@ function generate(thickness, lazerWidth){
     hole(x1-h2Diff*hdiry,y1-h2Diff*hdirx,x2-h2Diff*hdiry,y2-h2Diff*hdirx,true,2*Math.PI*i/5)
 
 
-    var iduktaN=6
-    var oduktaN=12
+    var iduktaN=8
+    var oduktaN=14
     for(var j=0;j<=iduktaN;j++){
       var th2=Math.asin(Math.sin(e.arc2.rad)*(2*j/iduktaN-1))
       var p1={
@@ -301,62 +304,28 @@ function generate(thickness, lazerWidth){
     }
   })
 
-
-
-
-  // var hbaseOffset=not-calculated;
-  // var hbaseLength=15
-  // var hbaseInterval=8
-  // var hduktaOffset=4
-  // var hduktaLength=8
-  // var hedgeOffset=2
-  // var hedgeLength=6
-
   var d=svg.lineWidth/2;
   var duktaLen=2*outerPos[0].arc1.r*Math.sin(outerPos[0].arc1.rad)
-  var duktaSupportR=duktaLen/radb+thickness
-  if(false)for(var i=0;i<5;i++){
-    var basex=59,basey=8.2*i-75;
-    svg.parametric(100, false, function(t){
-      return {
-        x: basex+duktaSupportR*Math.sin(radb*(t-0.5)),
-        y: basey+duktaSupportR*Math.cos(radb*(t-0.5))
-      }
-    })
-    var tmpx=duktaSupportR*Math.sin(radb/2);
-    var tmpy=duktaSupportR*Math.cos(radb/2);
-    var dx=Math.cos(radb/2),dy=-Math.sin(radb/2)
-    var line=[]
-    line.push({x:tmpx,y:tmpy})
-    line.push({x:tmpx+=(hduktaOffset-d)*dx,y:tmpy+=(hduktaOffset-d)*dy})
-    line.push({x:tmpx+=thickness*dy,y:tmpy-=thickness*dx})
-    line.push({x:tmpx+=(hduktaLength+2*d)*dx,y:tmpy+=(hduktaLength+2*d)*dy})
-    line.push({x:tmpx-=thickness*dy,y:tmpy+=thickness*dx})
-    line.push({x:tmpx-=hduktaLength*dx/2,y:tmpy-=hduktaLength*dy/2})
-    svg.curve([
-      {x:basex+tmpx,y:basey+tmpy},
-      {x:basex+tmpx-thickness*2,y:basey+tmpy+thickness*3},
-      {x:basex,y:basey+duktaSupportR+thickness},
-      {x:basex-tmpx+thickness*2,y:basey+tmpy+thickness*3},
-      {x:basex-tmpx,y:basey+tmpy}
-    ])
-    for(var dir=-1;dir<=2;dir+=2){
-      svg.line(line.map(function(p){return {x:basex+dir*p.x,y:basey+p.y}}))
-    }
-
-  }
-
 
   var edgeThickOffset=thickness*Math.tan(Math.PI/8)
   var edgerad=Math.atan(h)
   var ce=Math.cos(edgerad),se=Math.sin(edgerad);
   var d=svg.lineWidth/2;
   for(var i=0;i<10;i++){
-    var startx=90,starty=thickness*3.2*i-80+i%2*1.2
+    var startx=54;
+    var starty=thickness*3.2*i+i%2*1.2
+    if(i<5){
+      startx=51;
+      starty=thickness*3.3*i+i%2*1.2-78
+    }else{
+      startx=54-(i-5)*2;
+      starty=thickness*3*i+i%2*1.8-7
+    }
+
     var tmpx=startx, tmpy=starty;
     var line=[
       {x:tmpx,y:tmpy},
-      {x:tmpx+=-d+thickness/2,y:tmpy},
+      {x:tmpx+=-d+thickness*3/4,y:tmpy},
       {x:tmpx,y:tmpy+=thickness},
       {x:tmpx+=hbaseLength+2*d,y:tmpy},
       {x:tmpx,y:tmpy-=thickness},
@@ -365,38 +334,58 @@ function generate(thickness, lazerWidth){
       {x:tmpx-=se*thickness,y:tmpy+=ce*thickness},
       {x:tmpx+=ce*(hedgeLength+2*d),y:tmpy+=se*(hedgeLength+2*d)},
       {x:tmpx+=se*thickness,y:tmpy-=ce*thickness},
-      {x:tmpx+=ce*thickness,y:tmpy+=se*thickness},
+      {x:tmpx+=ce*2*thickness,y:tmpy+=se*2*thickness},
     ]
     var a=line[2]
     var b=line[3]
     var aa={x:(a.x+b.x-hbaseInterval)/2+2*d,y:a.y-thickness}
     var bb={x:(a.x+b.x+hbaseInterval)/2-2*d,y:a.y-thickness}
+    var curve1=[
+      {x:tmpx,y:tmpy},
+      {x:tmpx-thickness,y:tmpy-2*thickness},
+      {x:line[line.length-6].x+thickness/4,y:line[line.length-6].y-thickness*2/3},
+    ]
     if(i%2){
       line.splice(3,0,{x:aa.x,y:a.y},aa,bb,{x: bb.x,y:b.y})
       svg.line([{x:aa.x,y:aa.y-2.5*thickness},{x:bb.x,y:bb.y-2.5*thickness}])
+      curve1.push({x:bb.x+1*thickness,y:bb.y-1.5*thickness})
+      curve1.push({x:bb.x,y:bb.y-2.5*thickness})
+      svg.curve([
+        {x:aa.x,y:aa.y-2.5*thickness},
+        {x:(3*aa.x+startx)/4,y:aa.y-thickness*5/3},
+        {x:(aa.x+3*startx)/4,y:aa.y-thickness},
+        {x:startx,y:starty}
+      ])
     }else{
       svg.line([aa,bb])
+      curve1.push({x:bb.x+1.5*thickness,y:bb.y-thickness*4/5})
+      curve1.push({x:bb.x,y:bb.y})
+      svg.curve([
+        {x:aa.x,y:aa.y},
+        {x:(aa.x+startx)/2,y:aa.y-thickness/2},
+        {x:startx,y:starty}
+      ])
     }
-    svg.curve([
-      {x:tmpx,y:tmpy},
-      {x:tmpx-thickness,y:tmpy-2*thickness},
-      {x:line[line.length-6].x-thickness/2,y:line[line.length-6].y-thickness},
-      {x:bb.x,y:bb.y-i%2*2.5*thickness}
-    ])
-    svg.curve([
-      {x:aa.x,y:aa.y-i%2*2.5*thickness},
-      {x:(aa.x+startx)/2,y:aa.y-thickness/2-i%2*thickness},
-      {x:startx,y:starty}
-    ])
+    svg.curve(curve1)
     svg.line(line)
   }
 
   for(var i=0;i<10;i++){
-    var startx=122,starty=thickness*2.7*i-80
+    var yinterval=thickness*3
+    var xinterval=23
+    var startx=124,starty=thickness*2.7*i-80
+    if(i<5){
+      startx=-75+xinterval*Math.floor(i/2);
+      starty=-83+i%2*yinterval
+    }else{
+      startx=-75+xinterval*Math.floor((i-5)/2);
+      starty=77-(i-5)%2*yinterval
+    }
+
     var tmpx=startx, tmpy=starty;
     var line=[
       {x:tmpx,y:tmpy},
-      {x:tmpx+=-d+hbaseOffset/2,y:tmpy},
+      {x:tmpx+=-d+thickness*3/4,y:tmpy},
       {x:tmpx,y:tmpy+=thickness},
       {x:tmpx+=hbase2Length+2*d,y:tmpy},
       {x:tmpx,y:tmpy-=thickness},
@@ -405,7 +394,7 @@ function generate(thickness, lazerWidth){
       {x:tmpx-=se*thickness,y:tmpy+=ce*thickness},
       {x:tmpx+=ce*(hedgeLength+2*d),y:tmpy+=se*(hedgeLength+2*d)},
       {x:tmpx+=se*thickness,y:tmpy-=ce*thickness},
-      {x:tmpx+=ce*thickness,y:tmpy+=se*thickness},
+      {x:tmpx+=ce*thickness*15/16,y:tmpy+=se*thickness*15/16},
     ]
     var a=line[2]
     var b=line[3]
@@ -414,8 +403,8 @@ function generate(thickness, lazerWidth){
     svg.curve([
       {x:tmpx,y:tmpy},
       {x:tmpx-thickness,y:tmpy-2*thickness},
-      {x:line[line.length-6].x-thickness/2,y:line[line.length-6].y-thickness},
-      {x:line[line.length-6].x-thickness*3,y:line[line.length-6].y-thickness},
+      {x:line[line.length-6].x+thickness/4,y:line[line.length-6].y-thickness*2/3},
+      {x:startx+thickness*3/2,y:line[line.length-6].y-thickness*3/4},
       {x:startx,y:starty}
     ])
     svg.line(line)
