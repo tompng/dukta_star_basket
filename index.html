@@ -183,8 +183,8 @@ function generate(thickness, lazerWidth){
   console.error('a', 180/Math.PI*rada)
   console.error('b', 180/Math.PI*radb)
 
-  var innerfix=(inner/rada-thickness)/(inner/rada)
   var innerPos=edge(len,innerTOA,inner,outer)
+  var innerfix=(innerPos[0].arc2.r-thickness*h/Math.sqrt(1+h*h))/innerPos[0].arc2.r;
   var outerPos=edge(len,outerTOA,inner*innerfix,outer)
   function shapeRadius(theta){
     var r=2.6*len
