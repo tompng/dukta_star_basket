@@ -238,8 +238,8 @@ function generate(thickness, lazerWidth){
     y1=hbasey-(a-hbaseLength/2)*hdiry
     x2=hbasex-(a-hbaseLength/2+hbase2Length)*hdirx
     y2=hbasey-(a-hbaseLength/2+hbase2Length)*hdiry
-    hole(x1-h2Diff*hdiry,y1+h2Diff*hdirx,x2-h2Diff*hdiry,y2+h2Diff*hdirx,false,2*Math.PI*i/5)
-    hole(x1-h2Diff*hdiry,-y1-h2Diff*hdirx,x2-h2Diff*hdiry,-y2-h2Diff*hdirx,true,2*Math.PI*i/5)
+    hole(x1-h2Diff*hdiry,y1+h2Diff*hdirx,x2-h2Diff*hdiry,y2+h2Diff*hdirx,true,2*Math.PI*i/5)
+    hole(x1-h2Diff*hdiry,-y1-h2Diff*hdirx,x2-h2Diff*hdiry,-y2-h2Diff*hdirx,false,2*Math.PI*i/5)
 
   })
   var hedgeOffset=2
